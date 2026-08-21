@@ -1,20 +1,57 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Default promos to display if database is empty or loading
+const DEFAULT_PROMOS = [
+  {
+    id: 1,
+    name: "Weekend Special",
+    code: "WEEKEND15",
+    discount_percentage: 15,
+    description: "Enjoy 15% off on all electric vehicles during weekends.",
+    status: "active",
+  },
+  {
+    id: 2,
+    name: "Summer Drive",
+    code: "SUMMER20",
+    discount_percentage: 20,
+    description: "Get 20% off bike rentals for your summer trips.",
+    status: "active",
+  },
+  {
+    id: 3,
+    name: "Luxury Experience",
+    code: "LUXURY15",
+    discount_percentage: 15,
+    description: "Special luxury package deal for long-distance cruising.",
+    status: "active",
+  },
+];
+
 export default function Offer() {
   const navigate = useNavigate();
   const [promos, setPromos] = useState([]);
 
   useEffect(() => {
-    // Replace with your actual PythonAnywhere API endpoint URL
     fetch("https://rental-car-yvjh.onrender.com/api/promocode/")
       .then((res) => res.json())
       .then((data) => {
-        // Only display active promo codes
-        const activePromos = data.filter((p) => p.status === "active");
-        setPromos(activePromos);
+        if (Array.isArray(data) && data.length > 0) {
+          // Keep active promos OR promos where status isn't explicitly set
+          const activePromos = data.filter(
+            (p) => !p.status || p.status === "active",
+          );
+          setPromos(activePromos.length > 0 ? activePromos : DEFAULT_PROMOS);
+        } else {
+          // Fall back to default promos if backend returned empty []
+          setPromos(DEFAULT_PROMOS);
+        }
       })
-      .catch((err) => console.error("Error fetching promos:", err));
+      .catch((err) => {
+        console.error("Error fetching promos:", err);
+        setPromos(DEFAULT_PROMOS);
+      });
   }, []);
 
   const handleApplyOffer = (category, promoCode, discountPercentage) => {
@@ -32,7 +69,7 @@ export default function Offer() {
   };
 
   const getFilterCategory = (codename) => {
-    const code = codename.toLowerCase();
+    const code = (codename || "").toLowerCase();
     if (code.includes("weekend")) return "ev";
     if (code.includes("summer")) return "bike";
     return "all";
@@ -216,13 +253,11 @@ export default function Offer() {
       <section className="offers-section">
         <div className="offers-grid">
           {promos.map((p) => {
-            // Determine the category based on the promo code name
             const category = getFilterCategory(p.code || "");
 
             return (
               <div className="offer-card" key={p.id}>
                 <div className="offer-top">
-                  {/* Show recommended tag if it's the Luxury package or long-term */}
                   {p.code === "LUXURY15" && (
                     <div className="featured-tag">★ Highly Recommend</div>
                   )}
