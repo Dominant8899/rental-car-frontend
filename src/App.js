@@ -23,7 +23,7 @@ import { Login } from "./Login";
 import Dashboard from "./admin/Dashboard";
 import { useEffect, useState } from "react";
 import Account from "./Account";
-const API_URL = "https://odemine.pythonanywhere.com/api/vehicles/";
+const API_URL = "https://rental-car-yvjh.onrender.com/api/vehicles/";
 
 // Wrapper component to safely check the current path using standard React Router hooks
 function AppContent({ user, handleLoginSuccess, handleLogout }) {
