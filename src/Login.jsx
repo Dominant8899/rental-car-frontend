@@ -37,7 +37,7 @@ export function Login({ onLoginSuccess }) {
       localStorage.setItem("registeredUsers", JSON.stringify(existingUsers));
 
       // Sync the user registration profile to the backend customer database API
-      fetch("https://odemine.pythonanywhere.com/api/customer/", {
+      fetch("https://rental-car-yvjh.onrender.com/api/customer/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

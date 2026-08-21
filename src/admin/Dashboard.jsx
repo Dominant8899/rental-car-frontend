@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Receipt } from "../Receipt";
 
-const VEHICLES_API_URL = "https://odemine.pythonanywhere.com/api/vehicles/";
-const BOOKINGS_API_URL = "https://odemine.pythonanywhere.com/api/booking/";
-const CUSTOMER_API_URL = "https://odemine.pythonanywhere.com/api/customer/";
-const PROMOS_API_URL = "https://odemine.pythonanywhere.com/api/promocode/";
+const VEHICLES_API_URL = "https://rental-car-yvjh.onrender.com/api/vehicles/";
+const BOOKINGS_API_URL = "https://rental-car-yvjh.onrender.com/api/booking/";
+const CUSTOMER_API_URL = "https://rental-car-yvjh.onrender.com/api/customer/";
+const PROMOS_API_URL = "https://rental-car-yvjh.onrender.com/api/promocode/";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");

@@ -85,7 +85,7 @@ export default function RentVehicle({ user }) {
   const loadVehicles = async () => {
     try {
       const response = await fetch(
-        "https://odemine.pythonanywhere.com/api/vehicles/",
+        "https://rental-car-yvjh.onrender.com/api/vehicles/",
       );
       if (response.ok) {
         const data = await response.json();
@@ -100,7 +100,7 @@ export default function RentVehicle({ user }) {
   const fetchBookingsList = async () => {
     try {
       const response = await fetch(
-        "https://odemine.pythonanywhere.com/api/booking/",
+        "https://rental-car-yvjh.onrender.com/api/booking/",
       );
       if (response.ok) {
         const data = await response.json();

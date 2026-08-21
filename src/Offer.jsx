@@ -7,7 +7,7 @@ export default function Offer() {
 
   useEffect(() => {
     // Replace with your actual PythonAnywhere API endpoint URL
-    fetch("https://odemine.pythonanywhere.com/api/promocode/")
+    fetch("https://rental-car-yvjh.onrender.com/api/promocode/")
       .then((res) => res.json())
       .then((data) => {
         // Only display active promo codes
