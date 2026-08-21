@@ -1,62 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Default promos to display if database is empty or loading
-const DEFAULT_PROMOS = [
-  {
-    id: 1,
-    name: "Weekend Special",
-    code: "WEEKEND15",
-    discount_percentage: 15,
-    description: "Enjoy 15% off on all electric vehicles during weekends.",
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "Summer Drive",
-    code: "SUMMER20",
-    discount_percentage: 20,
-    description: "Get 20% off bike rentals for your summer trips.",
-    status: "active",
-  },
-  {
-    id: 3,
-    name: "Luxury Experience",
-    code: "LUXURY15",
-    discount_percentage: 15,
-    description: "Special luxury package deal for long-distance cruising.",
-    status: "active",
-  },
-];
-
 export default function Offer() {
   const navigate = useNavigate();
   const [promos, setPromos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("Fetching promocodes from backend...");
     fetch("https://rental-car-yvjh.onrender.com/api/promocode/")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
+        console.log("RAW BACKEND PROMO DATA RECEIVED:", data);
         if (Array.isArray(data) && data.length > 0) {
-          // Keep active promos OR promos where status isn't explicitly set
+          // Keep active promos OR promos where status isn't explicitly set to inactive
           const activePromos = data.filter(
-            (p) => !p.status || p.status === "active",
+            (p) => !p.status || p.status.toLowerCase() === "active",
           );
-          setPromos(activePromos.length > 0 ? activePromos : DEFAULT_PROMOS);
+          setPromos(activePromos.length > 0 ? activePromos : data);
         } else {
-          // Fall back to default promos if backend returned empty []
-          setPromos(DEFAULT_PROMOS);
+          setPromos([]);
         }
+        setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching promos:", err);
-        setPromos(DEFAULT_PROMOS);
+        console.error("Error fetching promos from backend:", err);
+        setLoading(false);
       });
   }, []);
 
   const handleApplyOffer = (category, promoCode, discountPercentage) => {
-    console.log("Applying offer:", promoCode);
-
     navigate("/rents", {
       state: {
         filterCategory: category,
@@ -77,13 +53,6 @@ export default function Offer() {
 
   return (
     <div className="offers-page-wrapper">
-      <meta charSet="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Special Offers | Odemine</title>
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-      />
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -94,7 +63,7 @@ export default function Offer() {
               min-height: 100vh;
             }
             .offers-page-wrapper .page-header {
-              padding: 180px 5%;
+              padding: 180px 5% 60px;
               position: relative;
               z-index: 1;
               background: linear-gradient(135deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.85) 100%), url('/image/bmw.png') center/cover no-repeat;
@@ -114,7 +83,7 @@ export default function Offer() {
               font-weight: 600;
             }
             .offers-page-wrapper .offers-section {
-              padding: 80px 5% 100px;
+              padding: 40px 5% 100px;
             }
             .offers-page-wrapper .offers-grid {
               display: grid;
@@ -223,18 +192,6 @@ export default function Offer() {
               background: #cc0030;
               transform: translateY(-2px);
             }
-            .offers-page-wrapper .featured-tag {
-              position: absolute;
-              top: 10px; left: 17px;
-              background: var(--red, #ff003c);
-              color: #fff;
-              font-family: 'Roboto Condensed', sans-serif;
-              font-size: 0.65rem;
-              letter-spacing: 2px;
-              text-transform: uppercase;
-              padding: 4px 12px;
-              border-radius: 5px;
-            }
             @media (max-width: 900px) {
               .offers-page-wrapper .offers-grid { grid-template-columns: 1fr 1fr; }
             }
@@ -251,52 +208,56 @@ export default function Offer() {
       </header>
 
       <section className="offers-section">
-        <div className="offers-grid">
-          {promos.map((p) => {
-            const category = getFilterCategory(p.code || "");
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px", color: "#888" }}>
+            Loading offers...
+          </div>
+        ) : promos.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "40px", color: "#888" }}>
+            No promotional offers currently available.
+          </div>
+        ) : (
+          <div className="offers-grid">
+            {promos.map((p) => {
+              const category = getFilterCategory(p.code || p.Code || "");
+              const name = p.name || p.Name || "Special Promo";
+              const code = p.code || p.Code || "OFFER";
+              const discount =
+                p.discount_percentage || p["Discount percentage"] || 0;
+              const description =
+                p.description || p.Description || "Exclusive promotional deal.";
 
-            return (
-              <div className="offer-card" key={p.id}>
-                <div className="offer-top">
-                  {p.code === "LUXURY15" && (
-                    <div className="featured-tag">★ Highly Recommend</div>
-                  )}
-                  {p.code === "LONG30" && (
-                    <div className="featured-tag">★ Best Deal</div>
-                  )}
-
-                  <div className="offer-tag">
-                    <i className="fas fa-circle" /> Special Offer
+              return (
+                <div className="offer-card" key={p.id || code}>
+                  <div className="offer-top">
+                    <div className="offer-tag">
+                      <i className="fas fa-circle" /> Special Offer
+                    </div>
+                    <h2>{name}</h2>
+                    <div className="offer-discount-pill">
+                      {discount}
+                      <sup>%</sup>
+                      <sub>OFF</sub>
+                    </div>
                   </div>
-                  <h2>{p.name}</h2>
-                  <div className="offer-discount-pill">
-                    {p.discount_percentage}
-                    <sup>%</sup>
-                    <sub>OFF</sub>
+
+                  <div className="offer-body">
+                    <p className="offer-desc">{description}</p>
+                    <div className="promo-box">
+                      <div className="code">{code}</div>
+                    </div>
+                    <button
+                      className="btn-apply"
+                      onClick={() => handleApplyOffer(category, code, discount)}
+                    >
+                      APPLY THIS OFFER
+                    </button>
                   </div>
                 </div>
-
-                <div className="offer-body">
-                  <p className="offer-desc">
-                    {p.description ||
-                      "Limited time deal. Grab it before it expires!"}
-                  </p>
-                  <div className="promo-box">
-                    <div className="code">{p.code}</div>
-                  </div>
-                  <button
-                    className="btn-apply"
-                    onClick={() =>
-                      handleApplyOffer(category, p.code, p.discount_percentage)
-                    }
-                  >
-                    APPLY THIS OFFER
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
     </div>
   );
