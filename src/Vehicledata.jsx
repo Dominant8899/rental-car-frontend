@@ -1,4 +1,4 @@
-const API_URL = "https://odemine.pythonanywhere.com/api/vehicles/";
+const API_URL = "https://rental-car-yvjh.onrender.com/api/vehicles/";
 const vehiclesData = [
   {
     id: 1,

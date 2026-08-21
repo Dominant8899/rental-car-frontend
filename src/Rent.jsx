@@ -418,7 +418,7 @@ export default function RentVehicle({ user }) {
 
     try {
       const response = await fetch(
-        "https://odemine.pythonanywhere.com/api/booking/",
+        "https://rental-car-yvjh.onrender.com/api/booking/",
         {
           method: "POST",
           headers: {
